@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            margin-top: 100px;
+            background-color: #f0f2f5;
+        }
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            width: 320px;
+            margin: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            margin-bottom: 20px;
+        }
+        input {
+            display: block;
+            width: 100%;
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>Login Page</h2>
+
+    <input type="text" id="username" placeholder="Username">
+    <input type="password" id="password" placeholder="Password (8-12 chars)">
+
+    <button onclick="login()">Login</button>
+
+    <p id="message"></p>
+</div>
+
+<div id="dashboard" style="display:none; margin-top: 40px;">
+    <h2 style="color: green;">✅ Welcome to the Dashboard!</h2>
+    <p>You have successfully logged in.</p>
+    <button onclick="logout()" style="width:auto; padding: 8px 20px; background:#e53935;">Logout</button>
+</div>
+
+<script>
+
+    function isSQLInjection(input) {
+        const sqlPatterns = [
+            /'\s*OR\s*'1'\s*=\s*'1/i,
+            /'\s*OR\s*1\s*=\s*1/i,
+            /--/,
+            /;\s*DROP/i,
+            /UNION\s+SELECT/i,
+            /'\s*;\s*/
+        ];
+        return sqlPatterns.some(pattern => pattern.test(input));
+    }
+
+    function login() {
+        let username = document.getElementById("username").value;
+        let password = document.getElementById("password").value;
+        let message = document.getElementById("message");
+
+        message.style.color = "red";
+
+        if (username === "" || password === "") {
+            message.innerText = "Fields cannot be empty";
+            return;
+        }
+
+        if (isSQLInjection(username) || isSQLInjection(password)) {
+            message.innerText = "SQL Injection detected! Login blocked.";
+            return;
+        }
+
+        if (password.length < 8) {
+            message.innerText = "Password too short (min 8 characters)";
+            return;
+        }
+
+        if (password.length > 12) {
+            message.innerText = "Password too long (max 12 characters)";
+            return;
+        }
+
+        if (username === "admin" && password === "12345678") {
+            message.innerText = "";
+            document.querySelector(".login-box").style.display = "none";
+            document.getElementById("dashboard").style.display = "block";
+        }
+        else {
+            message.innerText = "Invalid credentials";
+        }
+    }
+
+    function logout() {
+        document.querySelector(".login-box").style.display = "block";
+        document.getElementById("dashboard").style.display = "none";
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+        document.getElementById("message").innerText = "";
+    }
+
+</script>
+
+</body>
+</html>
